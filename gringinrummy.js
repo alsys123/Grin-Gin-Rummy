@@ -759,6 +759,13 @@ function checkPlayerDeadwoodFitsBigGin() {
 function start() {
 
     log("start: Button New round pressed or came from new game.");
+
+
+// not working yet !!!!???? here....
+//    cLog("disable celebration.");
+//    // top any celebrations
+//    clearTimeout(gCelegrationTimer);
+//    gCelegrationTimer = null;
     
     game.deck = createDeck();
     shuffle(game.deck);

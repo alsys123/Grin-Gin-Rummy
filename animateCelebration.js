@@ -3,6 +3,7 @@
 
 const CelebrationLength = 15000; // 15 seconds
 
+let gCelegrationTimer = null;
 
 function celebrateMatchWin() {
 
@@ -56,7 +57,7 @@ function celebrateMatchWin_canvasStarburst_v7() {
     let running = true;
 
     // stop spawning after 5 seconds
-    setTimeout(() => { running = false; }, CelebrationLength);
+    gCelegrationTimer = setTimeout(() => { running = false; }, CelebrationLength);
 
     // initial stars
     for (let i = 0; i < count; i++) {
@@ -167,7 +168,7 @@ function celebrateMatchWin_fireworks() {
     let running = true;
 
     // stop spawning after 6 seconds
-    setTimeout(() => running = false, CelebrationLength); // was 6000
+    gCelegrationTimer = setTimeout(() => running = false, CelebrationLength); // was 6000
 
     function spawnFirework() {
         const x = Math.random() * canvas.width;
@@ -297,7 +298,7 @@ function celebrateMatchWin_canvasBalloons_v1() {
     const count = 80;
     let running = true;
 
-    setTimeout(() => running = false, CelebrationLength);
+    gCelegrationTimer = setTimeout(() => running = false, CelebrationLength);
 
     function makeBalloon() {
         return {
@@ -417,7 +418,7 @@ function celebrateMatchWin_canvasBalloons_v2() {
     const count = 80;
     let running = true;
 
-    setTimeout(() => running = false, CelebrationLength);
+    gCelegrationTimer = setTimeout(() => running = false, CelebrationLength);
 
     function makeBalloon() {
         return {
@@ -583,7 +584,7 @@ function celebrateMatchWin_canvasBalloons_v3() {
     const count = 80;
     let running = true;
 
-    setTimeout(() => running = false, CelebrationLength);
+    gCelegrationTimer = setTimeout(() => running = false, CelebrationLength);
 
     function makeBalloon() {
         return {
@@ -766,7 +767,7 @@ function celebrateMatchWin_canvasLightning_v1() {
     let running = true;
 
     // stop after 6 seconds
-    setTimeout(() => running = false, CelebrationLength);
+    gCelegrationTimer = setTimeout(() => running = false, CelebrationLength);
 
     function makeBolt() {
         const startX = Math.random() * canvas.width;
@@ -908,7 +909,7 @@ function celebrateMatchWin_canvasButterflies_v1() {
     canvas.style.display = "block";
 
     let running = true;
-    setTimeout(() => running = false, CelebrationLength);
+    gCelegrationTimer = setTimeout(() => running = false, CelebrationLength);
 
     const speciesImages = [];
 
@@ -1072,7 +1073,7 @@ function celebrateMatchWin_canvasButterflies_v2() {
     canvas.style.display = "block";
 
     let running = true;
-    setTimeout(() => running = false, CelebrationLength);
+    gCelegrationTimer = setTimeout(() => running = false, CelebrationLength);
 
     // ------------------------------------------------------------
     // LOAD PNG SPECIES
@@ -1267,7 +1268,7 @@ canvas.width = canvas.width;   // full internal reset
     const edgeMargin        = 50;
 
     // CelebrationLength is defined outside this function
-    setTimeout(() => {
+    gCelegrationTimer = setTimeout(() => {
         running = false;
         fadeOut = true;
     }, CelebrationLength);
@@ -1542,7 +1543,7 @@ function celebrateMatchWin_canvasDolphins_v2() {
     const count = 12;
 
     let running = true;
-    setTimeout(() => running = false, CelebrationLength);
+    gCelegrationTimer = setTimeout(() => running = false, CelebrationLength);
 
     function makeDolphin() {
         return {
