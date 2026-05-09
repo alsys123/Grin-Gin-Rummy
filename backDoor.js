@@ -24,7 +24,7 @@ function openCloseBackDoor() {
     const open = gBackDoorCode === gBackDoorLock;
     document.getElementById("back-door").hidden = !open;
     
-    //  console.log("code:", gBackDoorCode, "dir:", gBackDoorDir, "open:", open);
+
 }
 
   /* ------------------------------
@@ -127,6 +127,11 @@ function openLoadDialog() {
   ------------------------------ */
 
 document.getElementById("btn-backDoor-settings").onclick = () => {
+
+    // clear old animations, if any
+    clearTimeout(gCelegrationTimer);
+    gCelebrationRunning = false;
+
     showSettings();
 }
 
@@ -460,7 +465,8 @@ function buildCelebrationTester() {
         { value: "f",  label: "f: Lightning" },
         { value: "g",  label: "g: Butterflies" },
         { value: "h",  label: "h: Butterflies v2" },
-        { value: "i",  label: "i: Butterflies v3" }
+        { value: "i",  label: "i: Butterflies v3" },
+        { value: "j",  label: "j: Dolphins" }	
 	    ];
     
     decks.forEach(d => {
@@ -482,6 +488,7 @@ function buildCelebrationTester() {
 	if (e.target.value === "g") celebrateMatchWin_canvasButterflies_v1();
 	if (e.target.value === "h") celebrateMatchWin_canvasButterflies_v2();
 	if (e.target.value === "i") celebrateMatchWin_canvasButterflies_v3();
+	if (e.target.value === "j") celebrateMatchWin_canvasDolphins_v4();
     });
 
     wrapper.appendChild(label);

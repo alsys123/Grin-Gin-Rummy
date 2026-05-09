@@ -1,22 +1,24 @@
 
 // NOTE **** THIS IS USED for all displays incuding PC and MAC.
 
-const CelebrationLength = 15000; // 15 seconds
+const CelebrationLength = 1500000; // was 1500 15 seconds .. now very long
 
-let gCelegrationTimer = null;
+let gCelegrationTimer   = null;
+let gCelebrationRunning = false;
 
 function celebrateMatchWin() {
 
     log("celebrateMatchWin","player");
 
     const celebrationEffects = [
+	celebrateMatchWin_canvasStarburst_v7,
 	celebrateMatchWin_canvasBalloons_v1,
 	celebrateMatchWin_canvasBalloons_v2,
-	celebrateMatchWin_canvasStarburst_v7,
 	celebrateMatchWin_fireworks,
 	celebrateMatchWin_canvasButterflies_v3	
+
 	//  .. out  celebrateMatchWin_canvasLightning_v1
-//not yet..	celebrateMatchWin_canvasDolphins_v2
+// .. out not yet..	celebrateMatchWin_canvasDolphins_v2
     ];
 
     const randomIndex = Math.floor(Math.random() * celebrationEffects.length);
@@ -54,11 +56,15 @@ function celebrateMatchWin_canvasStarburst_v7() {
     const particles = [];
     const count = 120;
 
-    let running = true;
+//    let running = true;
+    gCelebrationRunning = true;  // set to false outside
 
     // stop spawning after 5 seconds
-    gCelegrationTimer = setTimeout(() => { running = false; }, CelebrationLength);
-
+    gCelegrationTimer = setTimeout(() => { gCelebrationRunning = false; },
+				   CelebrationLength);
+//    gCelegrationTimer = setTimeout(() => { running = false; }, CelebrationLength);
+    cLog("timerID:",gCelegrationTimer);
+    
     // initial stars
     for (let i = 0; i < count; i++) {
         particles.push({
@@ -108,7 +114,8 @@ function celebrateMatchWin_canvasStarburst_v7() {
             p.life++;
 
             if (p.life >= p.maxLife) {
-                if (running) {
+//                if (running) {
+                if (gCelebrationRunning) {
                     // respawn
                     p.x = Math.random() * canvas.width;
                     p.y = Math.random() * canvas.height;
@@ -136,7 +143,9 @@ function celebrateMatchWin_canvasStarburst_v7() {
         }
 
         // stop when all stars are dead AND no respawning
-        if (!alive && !running) {
+//        if (!alive && !running) {
+        if (!alive && !gCelebrationRunning) {
+	    
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             canvas.style.display = "none";
             return;
@@ -165,10 +174,10 @@ function celebrateMatchWin_fireworks() {
     const colors = ["#FF4444", "#FFD700", "#7CFC00", "#87CEFA", "#FF69B4", "#FFA500"];
 
     const fireworks = [];
-    let running = true;
+    gCelebrationRunning = true;
 
     // stop spawning after 6 seconds
-    gCelegrationTimer = setTimeout(() => running = false, CelebrationLength); // was 6000
+    gCelegrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength); // was 6000
 
     function spawnFirework() {
         const x = Math.random() * canvas.width;
@@ -209,7 +218,7 @@ function celebrateMatchWin_fireworks() {
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        if (running && Math.random() < 0.08) {
+        if (gCelebrationRunning && Math.random() < 0.08) {
             spawnFirework();
         }
 
@@ -262,7 +271,7 @@ function celebrateMatchWin_fireworks() {
             }
         }
 
-        if (!alive && !running) {
+        if (!alive && !gCelebrationRunning) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             canvas.style.display = "none";
             return;
@@ -296,9 +305,9 @@ function celebrateMatchWin_canvasBalloons_v1() {
 
     const particles = [];
     const count = 80;
-    let running = true;
+    gCelebrationRunning = true;
 
-    gCelegrationTimer = setTimeout(() => running = false, CelebrationLength);
+    gCelegrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
 
     function makeBalloon() {
         return {
@@ -356,7 +365,7 @@ function celebrateMatchWin_canvasBalloons_v1() {
             p.life++;
 
             if (p.life >= p.maxLife) {
-                if (running) {
+                if (gCelebrationRunning) {
                     Object.assign(p, makeBalloon());
                 } else {
                     p.dead = true;
@@ -377,7 +386,7 @@ function celebrateMatchWin_canvasBalloons_v1() {
             drawBalloon(ctx, p.x, p.y, p.size, p.rotation, p.color, alpha);
         }
 
-        if (!alive && !running) {
+        if (!alive && !gCelebrationRunning) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             canvas.style.display = "none";
             return;
@@ -416,9 +425,9 @@ function celebrateMatchWin_canvasBalloons_v2() {
 
     const particles = [];
     const count = 80;
-    let running = true;
+    gCelebrationRunning = true;
 
-    gCelegrationTimer = setTimeout(() => running = false, CelebrationLength);
+    gCelegrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
 
     function makeBalloon() {
         return {
@@ -512,12 +521,18 @@ function celebrateMatchWin_canvasBalloons_v2() {
 
                 // pop conditions
                 if (p.y < -p.size || p.life >= p.maxLife) {
+		    if (gCelebrationRunning) {
+			// respawn balloon instead of popping
+			particles[i] = makeBalloon();
+			continue;
+		    } else {
                     const burst = makeConfettiBurst(p.x, p.y, p.color);
                     particles.splice(i, 1, ...burst);
                     i += burst.length - 1;
                     continue;
-                }
-
+                    }
+		}
+		
                 alive = true;
 
                 p.y -= p.riseSpeed;
@@ -544,7 +559,7 @@ function celebrateMatchWin_canvasBalloons_v2() {
             }
         }
 
-        if (!alive && !running) {
+        if (!alive && !gCelebrationRunning) {
             canvas.style.display = "none";
             return;
         }
@@ -582,9 +597,9 @@ function celebrateMatchWin_canvasBalloons_v3() {
 
     const particles = [];
     const count = 80;
-    let running = true;
+    gCelebrationRunning = true;
 
-    gCelegrationTimer = setTimeout(() => running = false, CelebrationLength);
+    gCelegrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
 
     function makeBalloon() {
         return {
@@ -732,7 +747,7 @@ function celebrateMatchWin_canvasBalloons_v3() {
             }
         }
 
-        if (!alive && !running) {
+        if (!alive && !gCelebrationRunning) {
             canvas.style.display = "none";
             return;
         }
@@ -764,10 +779,10 @@ function celebrateMatchWin_canvasLightning_v1() {
     ];
 
     const bolts = [];
-    let running = true;
+    gCelebrationRunning = true;
 
     // stop after 6 seconds
-    gCelegrationTimer = setTimeout(() => running = false, CelebrationLength);
+    gCelegrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
 
     function makeBolt() {
         const startX = Math.random() * canvas.width;
@@ -862,7 +877,7 @@ function celebrateMatchWin_canvasLightning_v1() {
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        if (running && Math.random() < 0.25) {
+        if (gCelebrationRunning && Math.random() < 0.25) {
             bolts.push(makeBolt());
         }
 
@@ -882,7 +897,7 @@ function celebrateMatchWin_canvasLightning_v1() {
             drawBolt(b);
         }
 
-        if (!alive && !running) {
+        if (!alive && !gCelebrationRunning) {
             canvas.style.display = "none";
             return;
         }
@@ -908,8 +923,8 @@ function celebrateMatchWin_canvasButterflies_v1() {
     canvas.style.zIndex = "999999";
     canvas.style.display = "block";
 
-    let running = true;
-    gCelegrationTimer = setTimeout(() => running = false, CelebrationLength);
+    gCelebrationRunning = true;
+    gCelegrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
 
     const speciesImages = [];
 
@@ -1047,7 +1062,7 @@ for (const p of paths) {
             drawButterfly(b);
         }
 
-        if (!running) {
+        if (!gCelebrationRunning) {
             canvas.style.display = "none";
             return;
         }
@@ -1072,8 +1087,8 @@ function celebrateMatchWin_canvasButterflies_v2() {
     canvas.style.zIndex = "999999";
     canvas.style.display = "block";
 
-    let running = true;
-    gCelegrationTimer = setTimeout(() => running = false, CelebrationLength);
+    gCelebrationRunning = true;
+    gCelegrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
 
     // ------------------------------------------------------------
     // LOAD PNG SPECIES
@@ -1214,7 +1229,7 @@ function celebrateMatchWin_canvasButterflies_v2() {
         b.y += b.vy * b.depth;
 
         // Respawn only if animation is still running
-        if (running && (b.y < -200 || b.x < -200 || b.x > canvas.width + 200)) {
+        if (gCelebrationRunning && (b.y < -200 || b.x < -200 || b.x > canvas.width + 200)) {
             const idx = butterflies.indexOf(b);
             butterflies[idx] = makeButterfly();
         }
@@ -1232,7 +1247,7 @@ function celebrateMatchWin_canvasButterflies_v2() {
         }
 
         // STOP CONDITION
-        if (!running) {
+        if (!gCelebrationRunning) {
             canvas.style.display = "none";
             return;
         }
@@ -1260,7 +1275,7 @@ canvas.width = canvas.width;   // full internal reset
     canvas.style.zIndex = "999999";
     canvas.style.display = "block";
 
-    let running = true;
+    gCelebrationRunning = true;
     let fadeOut = false;
     let fadeOutStart = null;
 
@@ -1269,7 +1284,7 @@ canvas.width = canvas.width;   // full internal reset
 
     // CelebrationLength is defined outside this function
     gCelegrationTimer = setTimeout(() => {
-        running = false;
+        gCelebrationRunning = false;
         fadeOut = true;
     }, CelebrationLength);
 //    }, 30000);
@@ -1540,10 +1555,10 @@ function celebrateMatchWin_canvasDolphins_v2() {
 
     const dolphins = [];
     const splashes = [];
-    const count = 12;
+    const count = 80;
 
-    let running = true;
-    gCelegrationTimer = setTimeout(() => running = false, CelebrationLength);
+    gCelebrationRunning = true;
+    gCelegrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
 
     function makeDolphin() {
         return {
@@ -1649,7 +1664,7 @@ function celebrateMatchWin_canvasDolphins_v2() {
         }
 
         // End celebration
-        if (!alive && !running) {
+        if (!alive && !gCelebrationRunning) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             canvas.style.display = "none";
             return;
@@ -1659,4 +1674,436 @@ function celebrateMatchWin_canvasDolphins_v2() {
     }
 
     requestAnimationFrame(draw);
-}
+} // dolphin v2
+
+function celebrateMatchWin_canvasDolphins_v3() {
+
+    log("celebrateMatchWin_canvasDolphins_v3", "player");
+
+    const canvas = document.getElementById("starburst-canvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.style.position = "fixed";
+    canvas.style.left = "0";
+    canvas.style.top = "0";
+    canvas.style.pointerEvents = "none";
+    canvas.style.zIndex = "999999";
+    canvas.style.display = "block";
+
+    gCelebrationRunning = true;
+    gCelegrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
+
+    // Dolphin silhouette
+    function drawDolphin(ctx, size, rot) {
+        ctx.rotate(rot);
+        ctx.scale(size, size);
+        ctx.beginPath();
+        ctx.moveTo(-1.2, 0.2);
+        ctx.quadraticCurveTo(-0.8, -0.4, 0, -0.3);
+        ctx.quadraticCurveTo(0.6, -0.2, 1.0, 0.1);
+        ctx.quadraticCurveTo(0.4, 0.0, -0.2, 0.4);
+        ctx.quadraticCurveTo(-0.8, 0.6, -1.2, 0.2);
+        ctx.fillStyle = "#4FC3F7";
+        ctx.fill();
+    }
+
+    const dolphins = [];
+    const splashes = [];
+    const bubbles  = [];
+    const ripples  = [];
+
+    const dolphinCount = 30;
+
+    function makeDolphin() {
+        return {
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            vx: (Math.random() - 0.5) * 1.2,   // slower
+            vy: (Math.random() - 0.5) * 1.2,
+            rot: (Math.random() - 0.5) * 0.2,
+            rotSpeed: (Math.random() - 0.5) * 0.02,
+            size: 40 + Math.random() * 40,
+            life: 0,
+            maxLife: 2000 + Math.random() * 1000, // MUCH longer
+            nextJump: 30 + Math.random() * 120,   // jump every 0.5–2s
+            dead: false
+        };
+    }
+
+    function makeSplash(x, y) {
+        return {
+            x, y,
+            vx: (Math.random() - 0.5) * 6,
+            vy: -2 - Math.random() * 3,
+            size: 4 + Math.random() * 6,
+            life: 0,
+            maxLife: 80 + Math.random() * 60,
+            dead: false
+        };
+    }
+
+    function makeBubble(x, y) {
+        return {
+            x, y,
+            vy: -0.5 - Math.random() * 1,
+            size: 2 + Math.random() * 3,
+            life: 0,
+            maxLife: 120 + Math.random() * 80,
+            dead: false
+        };
+    }
+
+    function makeRipple(x, y) {
+        return {
+            x, y,
+            radius: 2,
+            life: 0,
+            maxLife: 80,
+            dead: false
+        };
+    }
+
+    for (let i = 0; i < dolphinCount; i++) {
+        dolphins.push(makeDolphin());
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        let alive = false;
+
+        // Dolphins
+        for (const d of dolphins) {
+            if (d.dead) continue;
+
+            d.life++;
+
+            // movement
+            d.x += d.vx;
+            d.y += d.vy;
+            d.rot += d.rotSpeed;
+
+            // wrap around screen
+            if (d.x < -100) d.x = canvas.width + 100;
+            if (d.x > canvas.width + 100) d.x = -100;
+            if (d.y < -100) d.y = canvas.height + 100;
+            if (d.y > canvas.height + 100) d.y = -100;
+
+            // repeated jumps
+            if (d.life > d.nextJump) {
+                d.nextJump += 30 + Math.random() * 120; // schedule next jump
+
+                // splash burst
+                for (let i = 0; i < 25; i++) splashes.push(makeSplash(d.x, d.y));
+                for (let i = 0; i < 10; i++) bubbles.push(makeBubble(d.x, d.y));
+                ripples.push(makeRipple(d.x, d.y));
+            }
+
+            const t = d.life / d.maxLife;
+            if (t >= 1) {
+                d.dead = true;
+                continue;
+            }
+
+            alive = true;
+
+            ctx.save();
+            ctx.translate(d.x, d.y);
+            ctx.globalAlpha = 1 - t * 0.3; // fade very slowly
+            drawDolphin(ctx, d.size / 100, d.rot);
+            ctx.restore();
+        }
+
+        // Splashes
+        for (const s of splashes) {
+            if (s.dead) continue;
+
+            s.life++;
+            s.x += s.vx;
+            s.y += s.vy;
+            s.vy += 0.1;
+
+            const t = s.life / s.maxLife;
+            if (t >= 1) {
+                s.dead = true;
+                continue;
+            }
+
+            ctx.save();
+            ctx.globalAlpha = 1 - t;
+            ctx.fillStyle = "#81D4FA";
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // Bubbles
+        for (const b of bubbles) {
+            if (b.dead) continue;
+
+            b.life++;
+            b.y += b.vy;
+
+            const t = b.life / b.maxLife;
+            if (t >= 1) {
+                b.dead = true;
+                continue;
+            }
+
+            ctx.save();
+            ctx.globalAlpha = 0.4 * (1 - t);
+            ctx.strokeStyle = "#B3E5FC";
+            ctx.beginPath();
+            ctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        // Ripples
+        for (const r of ripples) {
+            if (r.dead) continue;
+
+            r.life++;
+            r.radius += 1.2;
+
+            const t = r.life / r.maxLife;
+            if (t >= 1) {
+                r.dead = true;
+                continue;
+            }
+
+            ctx.save();
+            ctx.globalAlpha = 0.3 * (1 - t);
+            ctx.strokeStyle = "#4FC3F7";
+            ctx.beginPath();
+            ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        if (!alive && !gCelebrationRunning) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.style.display = "none";
+            return;
+        }
+
+        requestAnimationFrame(draw);
+    }
+
+    requestAnimationFrame(draw);
+} // dolphins v3
+
+function celebrateMatchWin_canvasDolphins_v4() {
+
+    log("celebrateMatchWin_canvasDolphins_v3", "player");
+
+    const canvas = document.getElementById("starburst-canvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.style.position = "fixed";
+    canvas.style.left = "0";
+    canvas.style.top = "0";
+    canvas.style.pointerEvents = "none";
+    canvas.style.zIndex = "999999";
+    canvas.style.display = "block";
+
+    gCelebrationRunning = true;
+    gCelegrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
+// ------------------------------------------------------------
+    // 1. LOAD YOUR DOLPHIN IMAGE HERE
+    // ------------------------------------------------------------
+//    const dolphinImg = new Image();
+//    dolphinImg.src = "images/dolphins/d1.png";   // your file path
+
+    // optional: multiple dolphin images
+    const dolphinImgs = [
+        "images/dolphins/d1.png",
+        "images/dolphins/d2.png",
+        "images/dolphins/d3.png"
+    ].map(src => {
+        const img = new Image();
+        img.src = src;
+        return img;
+    });
+
+    // ------------------------------------------------------------
+    // 2. NOW create dolphins AFTER images exist
+    // ------------------------------------------------------------
+    function makeDolphin() {
+        return {
+            img: dolphinImgs[Math.floor(Math.random() * dolphinImgs.length)],
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            vx: (Math.random() - 0.5) * 0.6,
+            vy: (Math.random() - 0.5) * 0.6,
+            rot: 0,
+            size: 120,   // visible size
+            life: 0,
+            maxLife: 3000,
+            nextJump: 60 + Math.random() * 120,
+            dead: false
+        };
+    }
+
+    // ------------------------------------------------------------
+    // BIG, CLEAR DOLPHIN SHAPE
+    // ------------------------------------------------------------
+    function drawDolphin(ctx, size, rot) {
+        ctx.rotate(rot);
+        ctx.scale(size, size);
+
+        ctx.beginPath();
+        ctx.moveTo(-1.5, 0.3);
+        ctx.quadraticCurveTo(-1.0, -0.6, 0, -0.4);
+        ctx.quadraticCurveTo(0.8, -0.3, 1.4, 0.2);
+        ctx.quadraticCurveTo(0.6, 0.1, -0.3, 0.6);
+        ctx.quadraticCurveTo(-1.0, 0.8, -1.5, 0.3);
+
+        ctx.fillStyle = "#4FC3F7";
+        ctx.fill();
+    }
+
+    const dolphins = [];
+    const splashes = [];
+
+    const dolphinCount = 20; // fewer, but bigger and clearer
+
+    // ------------------------------------------------------------
+    // DOLPHINS THAT MOVE SLOWLY AND STAY VISIBLE
+    // ------------------------------------------------------------
+    function makeDolphin() {
+        return {
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            vx: (Math.random() - 0.5) * 0.6,   // MUCH slower
+            vy: (Math.random() - 0.5) * 0.6,
+            rot: (Math.random() - 0.5) * 0.1,
+            rotSpeed: (Math.random() - 0.5) * 0.01,
+            size: 1.2 + Math.random() * 0.8,  // BIG dolphins
+            life: 0,
+            maxLife: 3000 + Math.random() * 2000, // VERY long life
+            nextJump: 60 + Math.random() * 120,   // jump every 1–3 seconds
+            dead: false
+        };
+    }
+
+    // ------------------------------------------------------------
+    // SMALLER, CONTROLLED SPLASHES
+    // ------------------------------------------------------------
+    function makeSplash(x, y) {
+        return {
+            x, y,
+            vx: (Math.random() - 0.5) * 2,
+            vy: -1 - Math.random() * 1.5,
+            size: 3 + Math.random() * 3,
+            life: 0,
+            maxLife: 60 + Math.random() * 40,
+            dead: false
+        };
+    }
+
+    for (let i = 0; i < dolphinCount; i++) {
+        dolphins.push(makeDolphin());
+    }
+
+    // ------------------------------------------------------------
+    // MAIN LOOP
+    // ------------------------------------------------------------
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        let alive = false;
+
+        // -----------------------------
+        // DOLPHINS
+        // -----------------------------
+        for (const d of dolphins) {
+            if (d.dead) continue;
+
+            d.life++;
+
+            // slow movement
+            d.x += d.vx;
+            d.y += d.vy;
+            d.rot += d.rotSpeed;
+
+            // wrap around screen
+            if (d.x < -200) d.x = canvas.width + 200;
+            if (d.x > canvas.width + 200) d.x = -200;
+            if (d.y < -200) d.y = canvas.height + 200;
+            if (d.y > canvas.height + 200) d.y = -200;
+
+            // repeated jumps
+            if (d.life > d.nextJump) {
+                d.nextJump += 60 + Math.random() * 120;
+
+                // controlled splash
+                for (let i = 0; i < 10; i++) {
+                    splashes.push(makeSplash(d.x, d.y));
+                }
+            }
+
+            const t = d.life / d.maxLife;
+            if (t >= 1) {
+                d.dead = true;
+                continue;
+            }
+
+            alive = true;
+
+            ctx.save();
+            ctx.translate(d.x, d.y);
+            ctx.globalAlpha = 1 - t * 0.2; // fade VERY slowly
+            drawDolphin(ctx, d.size, d.rot);
+            ctx.restore();
+        }
+
+        // -----------------------------
+        // SPLASHES
+        // -----------------------------
+        for (const s of splashes) {
+            if (s.dead) continue;
+
+            s.life++;
+            s.x += s.vx;
+            s.y += s.vy;
+            s.vy += 0.05;
+
+            const t = s.life / s.maxLife;
+            if (t >= 1) {
+                s.dead = true;
+                continue;
+            }
+
+            ctx.save();
+            ctx.globalAlpha = 1 - t;
+            ctx.fillStyle = "#81D4FA";
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // -----------------------------
+        // END CELEBRATION
+        // -----------------------------
+        if (!alive && !gCelebrationRunning) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.style.display = "none";
+            return;
+        }
+
+        requestAnimationFrame(draw);
+    }
+
+    requestAnimationFrame(draw);
+} // dolphins v4
+
+
+
+
