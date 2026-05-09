@@ -1898,7 +1898,7 @@ function celebrateMatchWin_canvasDolphins_v3() {
 
 function celebrateMatchWin_canvasDolphins_v4() {
 
-    log("celebrateMatchWin_canvasDolphins_v3", "player");
+    log("celebrateMatchWin_canvasDolphins_v4", "player");
 
     const canvas = document.getElementById("starburst-canvas");
     const ctx = canvas.getContext("2d");
@@ -1914,13 +1914,8 @@ function celebrateMatchWin_canvasDolphins_v4() {
 
     gCelebrationRunning = true;
     gCelegrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
-// ------------------------------------------------------------
-    // 1. LOAD YOUR DOLPHIN IMAGE HERE
-    // ------------------------------------------------------------
-//    const dolphinImg = new Image();
-//    dolphinImg.src = "images/dolphins/d1.png";   // your file path
 
-    // optional: multiple dolphin images
+    // Load dolphin images
     const dolphinImgs = [
         "images/dolphins/d1.png",
         "images/dolphins/d2.png",
@@ -1931,9 +1926,7 @@ function celebrateMatchWin_canvasDolphins_v4() {
         return img;
     });
 
-    // ------------------------------------------------------------
-    // 2. NOW create dolphins AFTER images exist
-    // ------------------------------------------------------------
+    // Create dolphins
     function makeDolphin() {
         return {
             img: dolphinImgs[Math.floor(Math.random() * dolphinImgs.length)],
@@ -1941,60 +1934,28 @@ function celebrateMatchWin_canvasDolphins_v4() {
             y: Math.random() * canvas.height,
             vx: (Math.random() - 0.5) * 0.6,
             vy: (Math.random() - 0.5) * 0.6,
-            rot: 0,
-            size: 120,   // visible size
+            rot: (Math.random() - 0.5) * 0.1,
+            rotSpeed: (Math.random() - 0.5) * 0.01,
+            size: 120,
             life: 0,
-            maxLife: 3000,
+            maxLife: 3000 + Math.random() * 2000,
             nextJump: 60 + Math.random() * 120,
             dead: false
         };
     }
 
-    // ------------------------------------------------------------
-    // BIG, CLEAR DOLPHIN SHAPE
-    // ------------------------------------------------------------
-    function drawDolphin(ctx, size, rot) {
-        ctx.rotate(rot);
-        ctx.scale(size, size);
-
-        ctx.beginPath();
-        ctx.moveTo(-1.5, 0.3);
-        ctx.quadraticCurveTo(-1.0, -0.6, 0, -0.4);
-        ctx.quadraticCurveTo(0.8, -0.3, 1.4, 0.2);
-        ctx.quadraticCurveTo(0.6, 0.1, -0.3, 0.6);
-        ctx.quadraticCurveTo(-1.0, 0.8, -1.5, 0.3);
-
-        ctx.fillStyle = "#4FC3F7";
-        ctx.fill();
+    // Draw dolphin using image
+    function drawDolphin(d) {
+        ctx.save();
+        ctx.translate(d.x, d.y);
+        ctx.rotate(d.rot);
+        ctx.globalAlpha = 1 - (d.life / d.maxLife) * 0.2;
+        
+        ctx.drawImage(d.img, -d.size / 2, -d.size / 2, d.size, d.size);
+        
+        ctx.restore();
     }
 
-    const dolphins = [];
-    const splashes = [];
-
-    const dolphinCount = 20; // fewer, but bigger and clearer
-
-    // ------------------------------------------------------------
-    // DOLPHINS THAT MOVE SLOWLY AND STAY VISIBLE
-    // ------------------------------------------------------------
-    function makeDolphin() {
-        return {
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
-            vx: (Math.random() - 0.5) * 0.6,   // MUCH slower
-            vy: (Math.random() - 0.5) * 0.6,
-            rot: (Math.random() - 0.5) * 0.1,
-            rotSpeed: (Math.random() - 0.5) * 0.01,
-            size: 1.2 + Math.random() * 0.8,  // BIG dolphins
-            life: 0,
-            maxLife: 3000 + Math.random() * 2000, // VERY long life
-            nextJump: 60 + Math.random() * 120,   // jump every 1–3 seconds
-            dead: false
-        };
-    }
-
-    // ------------------------------------------------------------
-    // SMALLER, CONTROLLED SPLASHES
-    // ------------------------------------------------------------
     function makeSplash(x, y) {
         return {
             x, y,
@@ -2007,42 +1968,39 @@ function celebrateMatchWin_canvasDolphins_v4() {
         };
     }
 
+    const dolphins = [];
+    const splashes = [];
+    const dolphinCount = 20;
+
     for (let i = 0; i < dolphinCount; i++) {
         dolphins.push(makeDolphin());
     }
 
-    // ------------------------------------------------------------
-    // MAIN LOOP
-    // ------------------------------------------------------------
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         let alive = false;
 
-        // -----------------------------
-        // DOLPHINS
-        // -----------------------------
+        // Update and draw dolphins
         for (const d of dolphins) {
             if (d.dead) continue;
 
             d.life++;
 
-            // slow movement
+            // Slow movement
             d.x += d.vx;
             d.y += d.vy;
             d.rot += d.rotSpeed;
 
-            // wrap around screen
+            // Wrap around screen
             if (d.x < -200) d.x = canvas.width + 200;
             if (d.x > canvas.width + 200) d.x = -200;
             if (d.y < -200) d.y = canvas.height + 200;
             if (d.y > canvas.height + 200) d.y = -200;
 
-            // repeated jumps
+            // Repeated jumps - create splashes
             if (d.life > d.nextJump) {
                 d.nextJump += 60 + Math.random() * 120;
-
-                // controlled splash
                 for (let i = 0; i < 10; i++) {
                     splashes.push(makeSplash(d.x, d.y));
                 }
@@ -2055,17 +2013,10 @@ function celebrateMatchWin_canvasDolphins_v4() {
             }
 
             alive = true;
-
-            ctx.save();
-            ctx.translate(d.x, d.y);
-            ctx.globalAlpha = 1 - t * 0.2; // fade VERY slowly
-            drawDolphin(ctx, d.size, d.rot);
-            ctx.restore();
+            drawDolphin(d);
         }
 
-        // -----------------------------
-        // SPLASHES
-        // -----------------------------
+        // Update and draw splashes
         for (const s of splashes) {
             if (s.dead) continue;
 
@@ -2089,9 +2040,7 @@ function celebrateMatchWin_canvasDolphins_v4() {
             ctx.restore();
         }
 
-        // -----------------------------
-        // END CELEBRATION
-        // -----------------------------
+        // End celebration
         if (!alive && !gCelebrationRunning) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             canvas.style.display = "none";
@@ -2103,7 +2052,3 @@ function celebrateMatchWin_canvasDolphins_v4() {
 
     requestAnimationFrame(draw);
 } // dolphins v4
-
-
-
-
