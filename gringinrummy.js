@@ -762,11 +762,11 @@ function start() {
 
 
 // not working yet !!!!???? here....
-//    cLog("disable celebration ID:",gCelegrationTimer,gCelebrationRunning);
+//    cLog("disable celebration ID:",gCelebrationTimer,gCelebrationRunning);
     // top any celebrations
-    clearTimeout(gCelegrationTimer);
+    clearTimeout(gCelebrationTimer);
     gCelebrationRunning = false;
-//    gCelegrationTimer = null;
+//    gCelebrationTimer = null;
     
     game.deck = createDeck();
     shuffle(game.deck);

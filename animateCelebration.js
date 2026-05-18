@@ -3,8 +3,10 @@
 
 const CelebrationLength = 1500000; // was 1500 15 seconds .. now very long
 
-let gCelegrationTimer   = null;
+let gCelebrationTimer   = null;
 let gCelebrationRunning = false;
+
+let allowRespawn = true;
 
 function celebrateMatchWin() {
 
@@ -15,7 +17,7 @@ function celebrateMatchWin() {
 	celebrateMatchWin_canvasBalloons_v1,
 	celebrateMatchWin_canvasBalloons_v2,
 	celebrateMatchWin_fireworks,
-	celebrateMatchWin_canvasButterflies_v3	
+	celebrateMatchWin_canvasButterflies_v2	
 
 	//  .. out  celebrateMatchWin_canvasLightning_v1
 // .. out not yet..	celebrateMatchWin_canvasDolphins_v2
@@ -60,10 +62,10 @@ function celebrateMatchWin_canvasStarburst_v7() {
     gCelebrationRunning = true;  // set to false outside
 
     // stop spawning after 5 seconds
-    gCelegrationTimer = setTimeout(() => { gCelebrationRunning = false; },
+    gCelebrationTimer = setTimeout(() => { gCelebrationRunning = false; },
 				   CelebrationLength);
-//    gCelegrationTimer = setTimeout(() => { running = false; }, CelebrationLength);
-    cLog("timerID:",gCelegrationTimer);
+//    gCelebrationTimer = setTimeout(() => { running = false; }, CelebrationLength);
+//    cLog("timerID:",gCelebrationTimer);
     
     // initial stars
     for (let i = 0; i < count; i++) {
@@ -177,7 +179,7 @@ function celebrateMatchWin_fireworks() {
     gCelebrationRunning = true;
 
     // stop spawning after 6 seconds
-    gCelegrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength); // was 6000
+    gCelebrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength); // was 6000
 
     function spawnFirework() {
         const x = Math.random() * canvas.width;
@@ -307,7 +309,7 @@ function celebrateMatchWin_canvasBalloons_v1() {
     const count = 80;
     gCelebrationRunning = true;
 
-    gCelegrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
+    gCelebrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
 
     function makeBalloon() {
         return {
@@ -427,7 +429,7 @@ function celebrateMatchWin_canvasBalloons_v2() {
     const count = 80;
     gCelebrationRunning = true;
 
-    gCelegrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
+    gCelebrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
 
     function makeBalloon() {
         return {
@@ -599,7 +601,7 @@ function celebrateMatchWin_canvasBalloons_v3() {
     const count = 80;
     gCelebrationRunning = true;
 
-    gCelegrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
+    gCelebrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
 
     function makeBalloon() {
         return {
@@ -782,7 +784,7 @@ function celebrateMatchWin_canvasLightning_v1() {
     gCelebrationRunning = true;
 
     // stop after 6 seconds
-    gCelegrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
+    gCelebrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
 
     function makeBolt() {
         const startX = Math.random() * canvas.width;
@@ -924,7 +926,7 @@ function celebrateMatchWin_canvasButterflies_v1() {
     canvas.style.display = "block";
 
     gCelebrationRunning = true;
-    gCelegrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
+    gCelebrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
 
     const speciesImages = [];
 
@@ -1088,7 +1090,7 @@ function celebrateMatchWin_canvasButterflies_v2() {
     canvas.style.display = "block";
 
     gCelebrationRunning = true;
-    gCelegrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
+    gCelebrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
 
     // ------------------------------------------------------------
     // LOAD PNG SPECIES
@@ -1264,7 +1266,7 @@ function celebrateMatchWin_canvasButterflies_v3() {
     const ctx = canvas.getContext("2d");
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-canvas.width = canvas.width;   // full internal reset
+    canvas.width = canvas.width;   // full internal reset
 
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -1275,22 +1277,33 @@ canvas.width = canvas.width;   // full internal reset
     canvas.style.zIndex = "999999";
     canvas.style.display = "block";
 
-    gCelebrationRunning = true;
+
     let fadeOut = false;
     let fadeOutStart = null;
 
     const edgeMarginOnFade = 150;
     const edgeMargin        = 50;
 
+    // this is v2 version
+    gCelebrationRunning = true;
+    gCelebrationTimer = setTimeout(() => gCelebrationRunning = false,
+				   CelebrationLength);
+    
+/* THIS IS THE ORIGINAL ONE!!!!!!
+    gCelebrationRunning = true;
     // CelebrationLength is defined outside this function
-    gCelegrationTimer = setTimeout(() => {
+    gCelebrationTimer = setTimeout(() => {
         gCelebrationRunning = false;
         fadeOut = true;
-    }, CelebrationLength);
+	}, CelebrationLength);
+*/
+    
 //    }, 30000);
 
-    let allowRespawn = true;
-    setTimeout(() => allowRespawn = false, CelebrationLength * 0.5); // stop halfway
+//    allowRespawn = true;
+//    setTimeout(() => allowRespawn = false, CelebrationLength * 0.5);
+
+//    setTimeout(() => allowRespawn = false, CelebrationLength * 0.5); // stop halfway
 //    setTimeout(() => allowRespawn = false, CelebrationLength * 0.1); 
 //    setTimeout(() => allowRespawn = false, 2000); 
 
@@ -1391,7 +1404,7 @@ canvas.width = canvas.width;   // full internal reset
 
 	
 	// Fade-out: butterflies fly upward and leave the screen
-if (fadeOut) {
+	if (fadeOut) {
 
     // Disable hover and flutter
     b.hoverTime = 0;
@@ -1428,7 +1441,7 @@ if (fadeOut) {
     }
 
     return; // IMPORTANT: skip normal movement + respawn
-}//fadeOut
+	}//fadeOut
 
         // Wing flap
         b.flap += b.flapSpeed;
@@ -1515,12 +1528,17 @@ if (fadeOut) {
             return;
         }
 
-	
+	       // STOP CONDITION
+        if (!gCelebrationRunning) {
+            canvas.style.display = "none";
+            return;
+        }
+
         requestAnimationFrame(draw);
     }//draw
 
     requestAnimationFrame(draw);
-}
+}//celebrateMatchWin_canvasButterflies_v3
 
 function celebrateMatchWin_canvasDolphins_v2() {
 
@@ -1558,7 +1576,7 @@ function celebrateMatchWin_canvasDolphins_v2() {
     const count = 80;
 
     gCelebrationRunning = true;
-    gCelegrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
+    gCelebrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
 
     function makeDolphin() {
         return {
@@ -1693,7 +1711,7 @@ function celebrateMatchWin_canvasDolphins_v3() {
     canvas.style.display = "block";
 
     gCelebrationRunning = true;
-    gCelegrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
+    gCelebrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
 
     // Dolphin silhouette
     function drawDolphin(ctx, size, rot) {
@@ -1913,7 +1931,7 @@ function celebrateMatchWin_canvasDolphins_v4() {
     canvas.style.display = "block";
 
     gCelebrationRunning = true;
-    gCelegrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
+    gCelebrationTimer = setTimeout(() => gCelebrationRunning = false, CelebrationLength);
 
     // Load dolphin images
     const dolphinImgs = [

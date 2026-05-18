@@ -129,7 +129,7 @@ function openLoadDialog() {
 document.getElementById("btn-backDoor-settings").onclick = () => {
 
     // clear old animations, if any
-    clearTimeout(gCelegrationTimer);
+    clearTimeout(gCelebrationTimer);
     gCelebrationRunning = false;
 
     showSettings();
